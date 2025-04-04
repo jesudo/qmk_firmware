@@ -4,7 +4,7 @@
 
 // qmk compile -kb zsa/voyager -km j
 // press bootloader button on keyboard
-// qmk flash
+// qmk flash -kb zsa/voyager -km j
 
 
 /*
