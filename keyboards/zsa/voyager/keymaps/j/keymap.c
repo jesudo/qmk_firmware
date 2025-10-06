@@ -2,10 +2,15 @@
 
 #include QMK_KEYBOARD_H
 
+#define ONESHOT_TIMEOUT 600        // cancels after 600 ms if you don't hit a key
+#define ONESHOT_TAP_TOGGLE 2       // double‑tap a one‑shot to latch; tap once to clear
+
 // qmk compile -kb zsa/voyager -km j
 // press bootloader button on keyboard
 // qmk flash -kb zsa/voyager -km j
 
+
+// also edited: zsa/voyager/rules.mk
 
 /*
     (
@@ -17,30 +22,69 @@
     )
 */
 
+enum {
+    TD_SPC_TAB = 0,
+};
+
+
+#ifdef TAP_DANCE_ENABLE
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_SPC_TAB] = ACTION_TAP_DANCE_DOUBLE(KC_SPC, KC_TAB),
+};
+#endif
+
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    // ───────────────────────────── Base (0) ─────────────────────────────
+    // Bottom row change: add MO(4) on left (extra left-hand layer), MO(3) on right.
+    // Right thumb: Tap Dance Space/Tab.
     [0] = LAYOUT(
-        _______,    _______,        _______,        _______,        _______,        _______,                        _______,            _______,        _______,        _______,        _______,        _______,
+        OSM(MOD_LCTL), OSM(MOD_LALT), OSM(MOD_LGUI), OSL(3),        OSM(MOD_LSFT),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_Y,           KC_F,           KC_G,           _______,                        _______,            KC_C,           KC_R,           KC_L,           _______,        _______,
            KC_P,    KC_A,           KC_O,           KC_E,           KC_U,           KC_I,                           KC_D,               KC_H,           KC_T,           KC_N,           KC_S,           KC_Z,
-          MO(2),    KC_Q,           KC_K,           KC_X,           KC_B,           _______,                        _______,            KC_M,           KC_W,           KC_V,           KC_J,           MO(1),
-                                                                    LT(1,KC_ENT),   CTL_T(KC_TAB),                  SFT_T(KC_BSPC),     LT(2,KC_SPC)
+          MO(2),    KC_Q,           KC_K,           KC_X,           KC_B,           MO(4),                          MO(3),             KC_M,           KC_W,           KC_V,           KC_J,           MO(1),
+                                                                    MO(1),          CTL_T(KC_TAB),                  SFT_T(KC_BSPC),     TD(TD_SPC_TAB)                      // single=Space, double=Tab
     ),
+
+    // ───────────────────── Right-hand layer 1 (R‑Nav/Arrows) ─────────────────────
+    // LEFT SIDE = transparent; RIGHT SIDE = nav/edit block (only the right hand changes).
     [1] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_1,           KC_2,           KC_3,           _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_4,           KC_5,           KC_6,           KC_0,                           _______,        KC_HOME,        KC_UP,          KC_END,         _______,        _______,
-        _______,    _______,        KC_7,           KC_8,           KC_9,           _______,                        _______,        KC_LEFT,        KC_DOWN,        KC_RIGHT,       _______,        _______,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_HOME,        KC_UP,          KC_END,         KC_PGUP,        KC_DEL,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_PGDN,        KC_BSPC,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
     ),
+
+    // ───────────────────── Left-hand layer 2 (L‑Symbols) ─────────────────────
+    // LEFT SIDE = symbols; RIGHT SIDE = transparent.
     [2] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        _______,        KC_DOT,         KC_COMM,        _______,                        _______,        KC_PLUS,        KC_MINUS,       KC_AT,          _______,        _______,
-        _______,    _______,        KC_LPRN,        KC_RPRN,        KC_LCBR,        KC_RCBR,                        KC_EQL,         KC_ASTR,        KC_SLSH,        KC_PERC,        KC_DLR,         KC_TILD,
-        _______,    _______,        KC_LBRC,        KC_RBRC,        KC_LT,          KC_GT,                          _______,        KC_AMPR,        KC_EXLM,        KC_HASH,        KC_QUES,        _______,
+        _______,    _______,        KC_GRV,         KC_DOT,         KC_COMM,        KC_SCLN,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_LPRN,        KC_RPRN,        KC_LCBR,        KC_RCBR,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_LBRC,        KC_RBRC,        KC_LT,          KC_GT,                          _______,        _______,        _______,        _______,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
-    )
+    ),
 
+    // ─────────────── Right-hand layer 3 (R‑F‑keys/Media) ───────────────
+    // LEFT SIDE = transparent; RIGHT SIDE = F-keys + media.
+    [3] = LAYOUT(
+        _______,    _______,        _______,        _______,        _______,        _______,                        KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,          KC_F6,
+        _______,    _______,        _______,        _______,        _______,        _______,                        KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         KC_F12,
+        _______,    _______,        _______,        _______,        _______,        _______,                        KC_MPRV,        KC_MPLY,        KC_MNXT,        KC_VOLU,        KC_MUTE,        KC_TILD,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_MUTE,        KC_VOLD,        KC_VOLU,        _______,        _______,
+                                                                    _______,        _______,                        _______,        _______
+    ),
+
+    // ─────────────── Left-hand layer 4 (L‑Numbers/Extras) ───────────────
+    // LEFT SIDE = numbers & math; RIGHT SIDE = transparent.
+    [4] = LAYOUT(
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_1,           KC_2,           KC_3,           KC_MINS,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_4,           KC_5,           KC_6,           KC_EQL,                         _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_7,           KC_8,           KC_9,           KC_0,                           _______,        _______,        _______,        _______,        _______,        _______,
+                                                                    _______,        _______,                        _______,        _______
+    ),
 };
 
 
