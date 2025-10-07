@@ -24,14 +24,73 @@
 
 enum {
     TD_SPC_TAB = 0,
+    TD_BSPC_WORD,
 };
+
+typedef enum {
+    SINGLE_TAP,
+    SINGLE_HOLD,
+    DOUBLE_TAP,
+    DOUBLE_HOLD,
+    MORE_TAPS
+} td_hold_state_t;
+
+static td_hold_state_t dance_state;
+static td_hold_state_t cur_dance(tap_dance_state_t *state);
+
+void td_bspc_finished(tap_dance_state_t *state, void *user_data);
+void td_bspc_reset(tap_dance_state_t *state, void *user_data);
 
 
 #ifdef TAP_DANCE_ENABLE
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_SPC_TAB] = ACTION_TAP_DANCE_DOUBLE(KC_SPC, KC_TAB),
+    [TD_SPC_TAB]   = ACTION_TAP_DANCE_DOUBLE(KC_SPC, KC_TAB),
+    [TD_BSPC_WORD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_bspc_finished, td_bspc_reset),
 };
 #endif
+
+
+static td_hold_state_t cur_dance(tap_dance_state_t *state) {
+    if (state->count == 1) {
+        if (state->pressed) {
+            return SINGLE_HOLD;
+        } else {
+            return SINGLE_TAP;
+        }
+    } else if (state->count == 2) {
+        if (state->pressed) {
+            return DOUBLE_HOLD;
+        } else {
+            return DOUBLE_TAP;
+        }
+    }
+    return MORE_TAPS;
+}
+
+void td_bspc_finished(tap_dance_state_t *state, void *user_data) {
+    dance_state = cur_dance(state);
+
+    if (dance_state == SINGLE_TAP) {
+        tap_code(KC_BSPC);
+    } else if (dance_state == SINGLE_HOLD) {
+        register_code(KC_BSPC);       // holds until reset → autorepeat backspace
+    } else if (dance_state == DOUBLE_TAP) {
+        tap_code(KC_DEL);             // delete
+    } else if (dance_state == DOUBLE_HOLD) {
+        register_code(KC_DEL);        // holds until reset → autorepeat delete
+    } else {
+        // 3+ taps: do nothing (or pick a behavior if you want)
+    }
+}
+
+void td_bspc_reset(tap_dance_state_t *state, void *user_data) {
+    if (dance_state == SINGLE_HOLD) {
+        unregister_code(KC_BSPC);
+    } else if (dance_state == DOUBLE_HOLD) {
+        unregister_code(KC_DEL);
+    }
+    dance_state = SINGLE_TAP;
+}
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -40,10 +99,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Right thumb: Tap Dance Space/Tab.
     [0] = LAYOUT(
         OSM(MOD_LCTL), OSM(MOD_LALT), OSM(MOD_LGUI), OSL(3),        OSM(MOD_LSFT),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_Y,           KC_F,           KC_G,           _______,                        _______,            KC_C,           KC_R,           KC_L,           _______,        _______,
+        _______,    _______,        KC_Y,           KC_F,           KC_G,           KC_Q,                           KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
            KC_P,    KC_A,           KC_O,           KC_E,           KC_U,           KC_I,                           KC_D,               KC_H,           KC_T,           KC_N,           KC_S,           KC_Z,
-          MO(2),    KC_Q,           KC_K,           KC_X,           KC_B,           MO(4),                          MO(3),             KC_M,           KC_W,           KC_V,           KC_J,           MO(1),
-                                                                    MO(1),          CTL_T(KC_TAB),                  SFT_T(KC_BSPC),     TD(TD_SPC_TAB)                      // single=Space, double=Tab
+          MO(2),    MO(4),          KC_K,           KC_X,           KC_B,           MO(4),                          MO(3),              KC_M,           KC_W,           KC_V,           MO(3),          MO(1),
+                                                                    MO(1),          CTL_T(KC_TAB),                  TD(TD_BSPC_WORD),   TD(TD_SPC_TAB)                      // single=Space, double=Tab
     ),
 
     // ───────────────────── Right-hand layer 1 (R‑Nav/Arrows) ─────────────────────
