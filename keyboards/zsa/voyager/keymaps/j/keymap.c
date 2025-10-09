@@ -99,10 +99,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Right thumb: Tap Dance Space/Tab.
     [0] = LAYOUT(
         OSM(MOD_LCTL), OSM(MOD_LALT), OSM(MOD_LGUI), OSL(3),        OSM(MOD_LSFT),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_Y,           KC_F,           KC_G,           KC_Q,                           KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
+        _______,    _______,        KC_Y,           KC_F,           KC_G,           _______,                        KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
            KC_P,    KC_A,           KC_O,           KC_E,           KC_U,           KC_I,                           KC_D,               KC_H,           KC_T,           KC_N,           KC_S,           KC_Z,
-          MO(2),    MO(4),          KC_K,           KC_X,           KC_B,           MO(4),                          MO(3),              KC_M,           KC_W,           KC_V,           MO(3),          MO(1),
-                                                                    MO(1),          CTL_T(KC_TAB),                  TD(TD_BSPC_WORD),   TD(TD_SPC_TAB)                      // single=Space, double=Tab
+          MO(2),    MO(4),          KC_K,           KC_X,           KC_B,           _______,                        KC_Q,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
+                                                                    MO(5),          KC_LGUI,                        KC_BSPC,            KC_SPC
     ),
 
     // ───────────────────── Right-hand layer 1 (R‑Nav/Arrows) ─────────────────────
@@ -138,6 +138,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ─────────────── Left-hand layer 4 (L‑Numbers/Extras) ───────────────
     // LEFT SIDE = numbers & math; RIGHT SIDE = transparent.
     [4] = LAYOUT(
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_1,           KC_2,           KC_3,           KC_MINS,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_4,           KC_5,           KC_6,           KC_EQL,                         _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_7,           KC_8,           KC_9,           KC_0,                           _______,        _______,        _______,        _______,        _______,        _______,
+                                                                    _______,        _______,                        _______,        _______
+    ),
+    [5] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_1,           KC_2,           KC_3,           KC_MINS,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_4,           KC_5,           KC_6,           KC_EQL,                         _______,        _______,        _______,        _______,        _______,        _______,
