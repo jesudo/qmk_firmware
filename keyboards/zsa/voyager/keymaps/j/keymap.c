@@ -2,8 +2,9 @@
 
 #include QMK_KEYBOARD_H
 
-#define ONESHOT_TIMEOUT 600        // cancels after 600 ms if you don't hit a key
-#define ONESHOT_TAP_TOGGLE 2       // double‑tap a one‑shot to latch; tap once to clear
+#ifndef TAPPING_TERM
+    #define TAPPING_TERM 200  // tune to taste
+#endif
 
 // qmk compile -kb zsa/voyager -km j
 // press bootloader button on keyboard
@@ -22,96 +23,132 @@
     )
 */
 
-enum {
-    TD_SPC_TAB = 0,
-    TD_BSPC_WORD,
+
+// Homerow mods
+#define HM_A LSFT_T(KC_A)  // Shift
+#define HM_O LCTL_T(KC_O) // Ctrl
+#define HM_E ALT_T(KC_E)   // Alt
+#define HM_U LGUI_T(KC_U) // Command
+
+#define HM_H RSFT_T(KC_H)
+#define HM_T RCTL_T(KC_T)
+#define HM_N RALT_T(KC_N)
+#define HM_S RGUI_T(KC_S)
+
+// Toprow mods
+// #define HM_Y LGUI_T(KC_Y) // Command
+// #define HM_F LALT_T(KC_F) // Alt
+// #define HM_G LCTL_T(KC_G) // Ctrl
+
+// #define HM_C RCTL_T(KC_C)
+// #define HM_R RALT_T(KC_R)
+// #define HM_L RGUI_T(KC_L)
+
+
+// Custom keycodes
+enum custom_keycodes {
+    Y_PARENS = SAFE_RANGE,  // tap: y, hold: ()
+    F_BRACKS,               // tap: f, hold: []
+    G_BRACES,               // tap: g, hold: {}
+    DOT_COMMA,              // tap: ., hold: ,
+    DASH_SLASH,             // tap: -, hold: /
 };
 
-typedef enum {
-    SINGLE_TAP,
-    SINGLE_HOLD,
-    DOUBLE_TAP,
-    DOUBLE_HOLD,
-    MORE_TAPS
-} td_hold_state_t;
+// Per-key timers
+static uint16_t y_timer = 0;
+static uint16_t f_timer = 0;
+static uint16_t g_timer = 0;
+static uint16_t dot_timer = 0;
+static uint16_t dash_timer = 0;
 
-static td_hold_state_t dance_state;
-static td_hold_state_t cur_dance(tap_dance_state_t *state);
-
-void td_bspc_finished(tap_dance_state_t *state, void *user_data);
-void td_bspc_reset(tap_dance_state_t *state, void *user_data);
-
-
-#ifdef TAP_DANCE_ENABLE
-tap_dance_action_t tap_dance_actions[] = {
-    [TD_SPC_TAB]   = ACTION_TAP_DANCE_DOUBLE(KC_SPC, KC_TAB),
-    [TD_BSPC_WORD] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_bspc_finished, td_bspc_reset),
-};
-#endif
-
-
-static td_hold_state_t cur_dance(tap_dance_state_t *state) {
-    if (state->count == 1) {
-        if (state->pressed) {
-            return SINGLE_HOLD;
-        } else {
-            return SINGLE_TAP;
-        }
-    } else if (state->count == 2) {
-        if (state->pressed) {
-            return DOUBLE_HOLD;
-        } else {
-            return DOUBLE_TAP;
-        }
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case Y_PARENS:
+            if (record->event.pressed) {
+                y_timer = timer_read();
+                return false; // we’ll decide what to send on release/hold
+            } else {
+                if (timer_elapsed(y_timer) < TAPPING_TERM) {
+                    tap_code(KC_Y); // tap = letter
+                } else {
+                    // hold = ()
+                    send_string("()" SS_TAP(X_LEFT));
+                }
+                return false;
+            }
+        case F_BRACKS:
+            if (record->event.pressed) {
+                f_timer = timer_read();
+                return false;
+            } else {
+                if (timer_elapsed(f_timer) < TAPPING_TERM) {
+                    tap_code(KC_F);
+                } else {
+                    send_string("[]" SS_TAP(X_LEFT));
+                }
+                return false;
+            }
+        case G_BRACES:
+            if (record->event.pressed) {
+                g_timer = timer_read();
+                return false;
+            } else {
+                if (timer_elapsed(g_timer) < TAPPING_TERM) {
+                    tap_code(KC_G);
+                } else {
+                    send_string("{}" SS_TAP(X_LEFT));
+                }
+                return false;
+            }
+        case DOT_COMMA:
+            if (record->event.pressed) {
+                dot_timer = timer_read();
+                return false;
+            } else {
+                if (timer_elapsed(dot_timer) < TAPPING_TERM) {
+                    tap_code(KC_DOT);    // short tap -> "."
+                } else {
+                    tap_code(KC_COMM);   // long hold -> ","
+                }
+                return false;
+            }
+        case DASH_SLASH:
+            if (record->event.pressed) {
+                dash_timer = timer_read();
+                return false;
+            } else {
+                if (timer_elapsed(dash_timer) < TAPPING_TERM) {
+                    tap_code(KC_MINS);   // short tap -> "-"
+                } else {
+                    tap_code(KC_SLSH);   // long hold -> "/"
+                }
+                return false;
+            }
     }
-    return MORE_TAPS;
+    return true;
 }
 
-void td_bspc_finished(tap_dance_state_t *state, void *user_data) {
-    dance_state = cur_dance(state);
 
-    if (dance_state == SINGLE_TAP) {
-        tap_code(KC_BSPC);
-    } else if (dance_state == SINGLE_HOLD) {
-        register_code(KC_BSPC);       // holds until reset → autorepeat backspace
-    } else if (dance_state == DOUBLE_TAP) {
-        tap_code(KC_DEL);             // delete
-    } else if (dance_state == DOUBLE_HOLD) {
-        register_code(KC_DEL);        // holds until reset → autorepeat delete
-    } else {
-        // 3+ taps: do nothing (or pick a behavior if you want)
-    }
-}
-
-void td_bspc_reset(tap_dance_state_t *state, void *user_data) {
-    if (dance_state == SINGLE_HOLD) {
-        unregister_code(KC_BSPC);
-    } else if (dance_state == DOUBLE_HOLD) {
-        unregister_code(KC_DEL);
-    }
-    dance_state = SINGLE_TAP;
-}
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ───────────────────────────── Base (0) ─────────────────────────────
     // Bottom row change: add MO(4) on left (extra left-hand layer), MO(3) on right.
-    // Right thumb: Tap Dance Space/Tab.
     [0] = LAYOUT(
-        OSM(MOD_LCTL), OSM(MOD_LALT), OSM(MOD_LGUI), OSL(3),        OSM(MOD_LSFT),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_Y,           KC_F,           KC_G,           _______,                        KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
-           KC_P,    KC_A,           KC_O,           KC_E,           KC_U,           KC_I,                           KC_D,               KC_H,           KC_T,           KC_N,           KC_S,           KC_Z,
-          MO(2),    MO(4),          KC_K,           KC_X,           KC_B,           _______,                        KC_Q,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
-                                                                    MO(5),          KC_LGUI,                        KC_BSPC,            KC_SPC
+        _______,    OSM(MOD_LSFT),  OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
+        _______,    KC_ESC,         Y_PARENS,       F_BRACKS,       G_BRACES,       DOT_COMMA,                      KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
+           KC_P,    HM_A,           HM_O,           HM_E,           HM_U,           KC_I,                           KC_D,               HM_H,           HM_T,           HM_N,           HM_S,           KC_Z,
+          MO(2),    MO(4),          KC_K,           KC_X,           KC_B,           DASH_SLASH,                     KC_Q,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
+                                                                    MO(5),          KC_DEL,                         KC_BSPC,            KC_SPC
     ),
 
     // ───────────────────── Right-hand layer 1 (R‑Nav/Arrows) ─────────────────────
     // LEFT SIDE = transparent; RIGHT SIDE = nav/edit block (only the right hand changes).
     [1] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_HOME,        KC_UP,          KC_END,         KC_PGUP,        KC_DEL,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_ENT,         KC_UP,          KC_HOME,         KC_PGUP,        KC_DEL,
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_PGDN,        KC_BSPC,
-        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        KC_END,         _______,        _______,
                                                                     _______,        _______,                        _______,        _______
     ),
 
@@ -144,6 +181,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,    _______,        KC_7,           KC_8,           KC_9,           KC_0,                           _______,        _______,        _______,        _______,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
     ),
+
     [5] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_1,           KC_2,           KC_3,           KC_MINS,                        _______,        _______,        _______,        _______,        _______,        _______,
