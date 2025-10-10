@@ -136,9 +136,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // Bottom row change: add MO(4) on left (extra left-hand layer), MO(3) on right.
     [0] = LAYOUT(
         UG_TOGG,    OSM(MOD_LSFT),  OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
-        KC_TAB,     KC_ESC,         Y_PARENS,       F_BRACKS,       G_BRACES,       DOT_COMMA,                      KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
+        KC_TAB,     KC_ESC,         Y_PARENS,       F_BRACKS,       G_BRACES,       DOT_COMMA,                      KC_Q,               KC_C,           KC_R,           KC_L,           _______,        _______,
         KC_P,       HM_A,           HM_O,           HM_E,           HM_U,           KC_I,                           KC_D,               HM_H,           HM_T,           HM_N,           HM_S,           KC_Z,
-        MO(2),      MO(4),          KC_K,           KC_X,           KC_B,           DASH_SLASH,                     KC_Q,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
+        MO(2),      MO(4),          KC_K,           KC_X,           KC_B,           DASH_SLASH,                     KC_J,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
                                                                     MO(5),          KC_DEL,                         KC_BSPC,            KC_SPC
     ),
 
@@ -176,15 +176,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // LEFT SIDE = numbers & math; RIGHT SIDE = transparent.
     [4] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_1,           KC_2,           KC_3,           KC_MINS,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_1,           KC_2,           KC_3,           KC_PLUS,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_4,           KC_5,           KC_6,           KC_EQL,                         _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_7,           KC_8,           KC_9,           KC_0,                           _______,        _______,        _______,        _______,        _______,        _______,
-                                                                    _______,        _______,                        _______,        _______
+                                                                    KC_SEMICOLON,   KC_QUOTE,                       _______,        _______
     ),
 
     [5] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_1,           KC_2,           KC_3,           KC_MINS,                        _______,        _______,        _______,        _______,        _______,        _______,
+        _______,    _______,        KC_1,           KC_2,           KC_3,           KC_PLUS,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_4,           KC_5,           KC_6,           KC_EQL,                         _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_7,           KC_8,           KC_9,           KC_0,                           _______,        _______,        _______,        _______,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
