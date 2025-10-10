@@ -27,12 +27,12 @@
 // Homerow mods
 #define HM_A LSFT_T(KC_A)  // Shift
 #define HM_O LCTL_T(KC_O) // Ctrl
-#define HM_E ALT_T(KC_E)   // Alt
+#define HM_E LALT_T(KC_E) // Alt / Option
 #define HM_U LGUI_T(KC_U) // Command
 
 #define HM_H RSFT_T(KC_H)
 #define HM_T RCTL_T(KC_T)
-#define HM_N RALT_T(KC_N)
+#define HM_N RALT_T(KC_N) // Alt / Option
 #define HM_S RGUI_T(KC_S)
 
 // Toprow mods
@@ -135,10 +135,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ───────────────────────────── Base (0) ─────────────────────────────
     // Bottom row change: add MO(4) on left (extra left-hand layer), MO(3) on right.
     [0] = LAYOUT(
-        _______,    OSM(MOD_LSFT),  OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
-        _______,    KC_ESC,         Y_PARENS,       F_BRACKS,       G_BRACES,       DOT_COMMA,                      KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
-           KC_P,    HM_A,           HM_O,           HM_E,           HM_U,           KC_I,                           KC_D,               HM_H,           HM_T,           HM_N,           HM_S,           KC_Z,
-          MO(2),    MO(4),          KC_K,           KC_X,           KC_B,           DASH_SLASH,                     KC_Q,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
+        UG_TOGG,    OSM(MOD_LSFT),  OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
+        KC_TAB,     KC_ESC,         Y_PARENS,       F_BRACKS,       G_BRACES,       DOT_COMMA,                      KC_J,               KC_C,           KC_R,           KC_L,           _______,        _______,
+        KC_P,       HM_A,           HM_O,           HM_E,           HM_U,           KC_I,                           KC_D,               HM_H,           HM_T,           HM_N,           HM_S,           KC_Z,
+        MO(2),      MO(4),          KC_K,           KC_X,           KC_B,           DASH_SLASH,                     KC_Q,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
                                                                     MO(5),          KC_DEL,                         KC_BSPC,            KC_SPC
     ),
 
@@ -146,9 +146,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // LEFT SIDE = transparent; RIGHT SIDE = nav/edit block (only the right hand changes).
     [1] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_ENT,         KC_UP,          KC_HOME,         KC_PGUP,        KC_DEL,
-        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_LEFT,        KC_DOWN,        KC_RIGHT,       KC_PGDN,        KC_BSPC,
-        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        KC_END,         _______,        _______,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_ENT,         KC_UP,          KC_PGUP,        _______,        _______,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_LEFT,        KC_DOWN,        KC_RIGHT,       _______,        _______,
+        _______,    _______,        _______,        _______,        _______,        _______,                        _______,        KC_HOME,        KC_END,         KC_PGDN,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
     ),
 
@@ -193,6 +193,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 
 #define DIV 3
+#define DIV_2 4
 #define ADD 10
 
 #ifdef RGB_MATRIX_ENABLE
@@ -222,19 +223,23 @@ bool rgb_matrix_indicators_user(void) {
 
     // Index
     rgb_matrix_set_color(10,  200 / DIV + ADD, 90 / DIV + ADD, 160 / DIV + ADD);
+    rgb_matrix_set_color(11,   200 / DIV_2 + ADD, 90 / DIV_2 + ADD, 160 / DIV_2 + ADD);
     rgb_matrix_set_color(16,  200, 90, 160);
     rgb_matrix_set_color(17,  200 / DIV + ADD, 90 / DIV + ADD, 160 / DIV + ADD);
     rgb_matrix_set_color(22,  200 / DIV + ADD, 90 / DIV + ADD, 160 / DIV + ADD);
+    rgb_matrix_set_color(23,  200 / DIV_2 + ADD, 90 / DIV_2 + ADD, 160 / DIV_2 + ADD);
 
     // ===========================
     // ===== Right keyboard ======
     // ===========================
 
     // Index
-    rgb_matrix_set_color(33,  200 / DIV + ADD, 90 / DIV + ADD, 160 / DIV + ADD);
-    rgb_matrix_set_color(38,  200 / DIV + ADD, 90 / DIV + ADD, 160 / DIV + ADD);
+    rgb_matrix_set_color(32,  200 / DIV_2 + ADD, 90 / DIV_2 + ADD, 160 / DIV_2 + ADD);
+    rgb_matrix_set_color(33,  200 / DIV + ADD,   90 / DIV + ADD, 160 / DIV + ADD);
+    rgb_matrix_set_color(38,  200 / DIV + ADD,   90 / DIV + ADD, 160 / DIV + ADD);
     rgb_matrix_set_color(39,  200, 90, 160);
-    rgb_matrix_set_color(45,  200 / DIV + ADD, 90 / DIV + ADD, 160 / DIV + ADD);
+    rgb_matrix_set_color(44,  200 / DIV_2 + ADD, 90 / DIV_2 + ADD, 160 / DIV_2 + ADD);
+    rgb_matrix_set_color(45,  200 / DIV + ADD,   90 / DIV + ADD, 160 / DIV + ADD);
 
     // Middle
     rgb_matrix_set_color(34,  50 / DIV + ADD, 50 / DIV + ADD, 220 / DIV + ADD);
@@ -258,8 +263,9 @@ bool rgb_matrix_indicators_user(void) {
     uint8_t active_layer = biton32(layer_state);
     if (active_layer == 0) {
         rgb_matrix_set_color(5, 0, 0, 0);
+        rgb_matrix_set_color(26, 0, 0, 0);
     } else if (active_layer == 1) {
-        rgb_matrix_set_color(5, 200 / DIV + ADD, 100 / DIV + ADD, 100 / DIV + ADD);
+        rgb_matrix_set_color(26, 200 / DIV + ADD, 100 / DIV + ADD, 100 / DIV + ADD);
     } else if (active_layer == 2) {
         rgb_matrix_set_color(5, 100 / DIV + ADD, 100 / DIV + ADD, 200 / DIV + ADD);
     }
