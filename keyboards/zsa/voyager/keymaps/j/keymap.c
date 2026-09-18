@@ -6,6 +6,11 @@
     #define TAPPING_TERM 200  // tune to taste
 #endif
 
+#define SYMBOL_TAPPING_TERM 150
+#define WOW                 6
+#define WOW_1               7
+#define WOW_2               8
+
 // qmk compile -kb zsa/voyager -km j
 // press bootloader button on keyboard
 // qmk flash -kb zsa/voyager -km j
@@ -68,7 +73,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 y_timer = timer_read();
                 return false; // we’ll decide what to send on release/hold
             } else {
-                if (timer_elapsed(y_timer) < TAPPING_TERM) {
+                if (timer_elapsed(y_timer) < SYMBOL_TAPPING_TERM) {
                     tap_code(KC_Y); // tap = letter
                 } else {
                     // hold = ()
@@ -81,7 +86,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 f_timer = timer_read();
                 return false;
             } else {
-                if (timer_elapsed(f_timer) < TAPPING_TERM) {
+                if (timer_elapsed(f_timer) < SYMBOL_TAPPING_TERM) {
                     tap_code(KC_F);
                 } else {
                     send_string("[]" SS_TAP(X_LEFT));
@@ -93,7 +98,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 g_timer = timer_read();
                 return false;
             } else {
-                if (timer_elapsed(g_timer) < TAPPING_TERM) {
+                if (timer_elapsed(g_timer) < SYMBOL_TAPPING_TERM) {
                     tap_code(KC_G);
                 } else {
                     send_string("{}" SS_TAP(X_LEFT));
@@ -105,7 +110,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 dot_timer = timer_read();
                 return false;
             } else {
-                if (timer_elapsed(dot_timer) < TAPPING_TERM) {
+                if (timer_elapsed(dot_timer) < SYMBOL_TAPPING_TERM) {
                     tap_code(KC_DOT);    // short tap -> "."
                 } else {
                     tap_code(KC_COMM);   // long hold -> ","
@@ -117,7 +122,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 dash_timer = timer_read();
                 return false;
             } else {
-                if (timer_elapsed(dash_timer) < TAPPING_TERM) {
+                if (timer_elapsed(dash_timer) < SYMBOL_TAPPING_TERM) {
                     tap_code(KC_MINS);   // short tap -> "-"
                 } else {
                     tap_code(KC_SLSH);   // long hold -> "/"
@@ -135,7 +140,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ───────────────────────────── Base (0) ─────────────────────────────
     // Bottom row change: add MO(4) on left (extra left-hand layer), MO(3) on right.
     [0] = LAYOUT(
-        UG_TOGG,    OSM(MOD_LSFT),  OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        _______,
+        UG_TOGG,    OSM(MOD_LSFT),  OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_ENT,                         _______,            _______,        _______,        _______,        _______,        TG(WOW),
         KC_TAB,     KC_ESC,         Y_PARENS,       F_BRACKS,       G_BRACES,       DOT_COMMA,                      KC_Q,               KC_C,           KC_R,           KC_L,           _______,        _______,
         KC_P,       HM_A,           HM_O,           HM_E,           HM_U,           KC_I,                           KC_D,               HM_H,           HM_T,           HM_N,           HM_S,           KC_Z,
         MO(2),      MO(4),          KC_K,           KC_X,           KC_B,           DASH_SLASH,                     KC_J,               KC_M,           KC_W,           KC_V,           MO(1),          MO(3),
@@ -156,7 +161,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // LEFT SIDE = symbols; RIGHT SIDE = transparent.
     [2] = LAYOUT(
         _______,    _______,        _______,        _______,        _______,        _______,                        _______,        _______,        _______,        _______,        _______,        _______,
-        _______,    _______,        KC_GRV,         KC_DOT,         KC_COMM,        KC_SCLN,                        _______,        _______,        _______,        _______,        _______,        _______,
+        KC_BSLS,    KC_TILD,        KC_GRV,         KC_DOT,         KC_COMM,        KC_SCLN,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_LPRN,        KC_RPRN,        KC_LCBR,        KC_RCBR,                        _______,        _______,        _______,        _______,        _______,        _______,
         _______,    _______,        KC_LBRC,        KC_RBRC,        KC_LT,          KC_GT,                          _______,        _______,        _______,        _______,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
@@ -189,6 +194,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,    _______,        KC_7,           KC_8,           KC_9,           KC_0,                           _______,        _______,        _______,        _______,        _______,        _______,
                                                                     _______,        _______,                        _______,        _______
     ),
+
+    // WoW mode: left-side game bindings; right side remains on the programming layout.
+    [WOW] = LAYOUT(
+        KC_1,       KC_2,           KC_3,           KC_4,           KC_5,           KC_6,                           _______,            _______,        _______,        _______,        _______,        TG(WOW),
+        KC_7,       KC_8,           KC_9,           KC_W,           KC_R,           KC_T,                           _______,            _______,        _______,        _______,        _______,        _______,
+        KC_Q,       KC_E,           KC_A,           KC_S,           KC_D,           KC_F,                           _______,            _______,        _______,        _______,        _______,        _______,
+        KC_Z,       KC_X,           KC_C,           KC_V,           KC_B,           KC_G,                           _______,            _______,        _______,        _______,        _______,        _______,
+                                                                    MO(WOW_1),      MO(WOW_2),                     _______,        _______
+    ),
+
+    // Hold the outer left thumb key for a second set of WoW abilities.
+    [WOW_1] = LAYOUT(
+        KC_0,       KC_H,           KC_I,           KC_J,           KC_K,           KC_L,                           _______,            _______,        _______,        _______,        _______,        _______,
+        KC_M,       KC_N,           KC_O,           KC_W,           KC_P,           KC_U,                           _______,            _______,        _______,        _______,        _______,        _______,
+        KC_F1,      KC_F2,          KC_A,           KC_S,           KC_D,           KC_F3,                          _______,            _______,        _______,        _______,        _______,        _______,
+        KC_F4,      KC_F5,          KC_F6,          KC_F7,          KC_F8,          KC_F9,                          _______,            _______,        _______,        _______,        _______,        _______,
+                                                                    _______,        _______,                        _______,        _______
+    ),
+
+    // Hold the inner left thumb key for a third set of WoW abilities.
+    [WOW_2] = LAYOUT(
+        S(KC_1),    S(KC_2),        S(KC_3),        S(KC_4),        S(KC_5),        S(KC_6),                       _______,            _______,        _______,        _______,        _______,        _______,
+        S(KC_7),    S(KC_8),        S(KC_9),        KC_W,           S(KC_0),        S(KC_MINS),                    _______,            _______,        _______,        _______,        _______,        _______,
+        S(KC_EQL),  S(KC_LBRC),     KC_A,           KC_S,           KC_D,           S(KC_RBRC),                    _______,            _______,        _______,        _______,        _______,        _______,
+        C(KC_1),    C(KC_2),        C(KC_3),        C(KC_4),        C(KC_5),        C(KC_6),                       _______,            _______,        _______,        _______,        _______,        _______,
+                                                                    _______,        _______,                        _______,        _______
+    ),
 };
 
 
@@ -198,6 +230,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 #ifdef RGB_MATRIX_ENABLE
 bool rgb_matrix_indicators_user(void) {
+    bool wow_active = layer_state_is(WOW);
+
+    // WoW colors every left key, so clear them before restoring the normal layout.
+    if (!wow_active) {
+        for (uint8_t led = 0; led < 26; led++) {
+            rgb_matrix_set_color(led, 0, 0, 0);
+        }
+    }
 
     // ===========================
     // ===== Left keyboard =======
@@ -268,6 +308,47 @@ bool rgb_matrix_indicators_user(void) {
         rgb_matrix_set_color(26, 200 / DIV + ADD, 100 / DIV + ADD, 100 / DIV + ADD);
     } else if (active_layer == 2) {
         rgb_matrix_set_color(5, 100 / DIV + ADD, 100 / DIV + ADD, 200 / DIV + ADD);
+    }
+
+    if (wow_active) {
+        uint8_t red   = 35;
+        uint8_t green = 90;
+        uint8_t blue  = 25;
+
+        if (layer_state_is(WOW_1)) {
+            red   = 70;
+            green = 30;
+            blue  = 100;
+        } else if (layer_state_is(WOW_2)) {
+            red   = 100;
+            green = 25;
+            blue  = 35;
+        }
+
+        for (uint8_t led = 0; led < 26; led++) {
+            rgb_matrix_set_color(led, red, green, blue);
+        }
+
+        // Movement remains in the same physical positions on every WoW page.
+        rgb_matrix_set_color(9, 0, 120, 160);
+        rgb_matrix_set_color(14, 0, 120, 160);
+        rgb_matrix_set_color(15, 0, 120, 160);
+        rgb_matrix_set_color(16, 0, 120, 160);
+        rgb_matrix_set_color(24, 130, 130, 130);
+        rgb_matrix_set_color(25, 130, 130, 130);
+
+        if (!layer_state_is(WOW_1) && !layer_state_is(WOW_2)) {
+            for (uint8_t led = 0; led < 9; led++) {
+                rgb_matrix_set_color(led, 180, 90, 0);
+            }
+        } else if (layer_state_is(WOW_1)) {
+            rgb_matrix_set_color(12, 180, 90, 0);
+            rgb_matrix_set_color(13, 180, 90, 0);
+            rgb_matrix_set_color(17, 180, 90, 0);
+            for (uint8_t led = 18; led < 24; led++) {
+                rgb_matrix_set_color(led, 180, 90, 0);
+            }
+        }
     }
 
     return true;
